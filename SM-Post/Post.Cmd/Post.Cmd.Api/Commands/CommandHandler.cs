@@ -3,7 +3,7 @@ using Post.Cmd.Domain.Aggregates;
 
 namespace Post.Cmd.Api.Commands
 {
-    public class CommandHandler : ICommandHandler
+    public class CommandHandler : ICommandHandler 
     {
         private readonly IEventSourcingHandler<PostAggregate> _eventSourcingHandler;
 
