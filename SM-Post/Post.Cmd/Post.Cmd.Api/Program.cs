@@ -5,7 +5,10 @@ using Post.Cmd.Infrastructure.Repositories;
 using Post.Cmd.Infrastructure.Dispatchers;
 using Post.Cmd.Api.Commands;
 using Confluent.Kafka;
-
+using CQRS.Core.Handlers;
+using Post.Cmd.Infrastructure.Stores;
+using Post.Cmd.Domain.Aggregates;
+using Post.Cmd.Infrastructure.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<MongoDbConfig>(builder.Configuration.GetSection(nameof(MongoDbConfig)));
 builder.Services.Configure<ProducerConfig>(builder.Configuration.GetSection(nameof(ProducerConfig)));
 builder.Services.AddSingleton<IEventStoreRepository, EventStoreRepository>();
+builder.Services.AddScoped<IEventSourcingHandler<PostAggregate>, EventSourcingHandler>();
+builder.Services.AddScoped<IEventStore, EventStore>();
 builder.Services.AddScoped<ICommandHandler, CommandHandler>();
 
 // register command handler methods - why do we need this?
