@@ -1,9 +1,13 @@
 using CQRS.Core.Consumers;
+using CQRS.Core.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Post.Query.Api.Queries;
+using Post.Query.Domain.Entities;
 using Post.Query.Domain.Repositories;
 using Post.Query.Infrastructure.Consumers;
 using Post.Query.Infrastructure.DataAccess;
+using Post.Query.Infrastructure.Dispatchers;
 using Post.Query.Infrastructure.Handlers;
 using Post.Query.Infrastructure.Repositories;
 
@@ -22,6 +26,16 @@ builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IEventHandler, Post.Query.Infrastructure.Handlers.EventHandler>();
 builder.Services.AddScoped<IEventConsumer, EventConsumer>();
+
+// register query handler methods
+var queryHandler = builder.Services.BuildServiceProvider().GetRequiredService<IQueryHandler>();
+var dispatcher = new QueryDispatcher();
+dispatcher.RegisterHandler<FindAllPostsQuery>(queryHandler.HandleAsync);
+dispatcher.RegisterHandler<FindPostByIdQuery>(queryHandler.HandleAsync);
+dispatcher.RegisterHandler<FindPostsByAuthorQuery>(queryHandler.HandleAsync);
+dispatcher.RegisterHandler<FindPostsWithCommentsQuery>(queryHandler.HandleAsync);
+dispatcher.RegisterHandler<FindPostsWithLikesQuery>(queryHandler.HandleAsync);
+builder.Services.AddScoped<IQueryDispatcher<PostEntity>>(_ => dispatcher);
 
 builder.Services.AddControllers();
 builder.Services.AddHostedService<ConsumerHostedService>();
