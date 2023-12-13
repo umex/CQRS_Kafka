@@ -11,8 +11,22 @@ using Post.Cmd.Domain.Aggregates;
 using Post.Cmd.Infrastructure.Handlers;
 using CQRS.Core.Producers;
 using Post.Cmd.Infrastructure.Producers;
+using MongoDB.Bson.Serialization;
+using CQRS.Core.Events;
+using Post.Common.Events;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//this needed to be added because MongoDB on default does not support polymorphism
+//and we get an error in EventStoreRepository, because MongoDB coulnt map BaseEvent from EventModel.
+BsonClassMap.RegisterClassMap<BaseEvent>();
+BsonClassMap.RegisterClassMap<PostCreatedEvent>();
+BsonClassMap.RegisterClassMap<MessageUpdatedEvent>();
+BsonClassMap.RegisterClassMap<PostLikedEvent>();
+BsonClassMap.RegisterClassMap<CommentAddedEvent>();
+BsonClassMap.RegisterClassMap<CommentUpdatedEvent>();
+BsonClassMap.RegisterClassMap<CommentRemovedEvent>();
+BsonClassMap.RegisterClassMap<PostRemovedEvent>();
 
 // Add services to the container.
 builder.Services.Configure<MongoDbConfig>(builder.Configuration.GetSection(nameof(MongoDbConfig)));
@@ -24,7 +38,7 @@ builder.Services.AddScoped<IEventSourcingHandler<PostAggregate>, EventSourcingHa
 builder.Services.AddScoped<ICommandHandler, CommandHandler>();
 
 
-// register command handler methods - why do we need this?
+// register command handler methods 
 var commandHandler = builder.Services.BuildServiceProvider().GetRequiredService<ICommandHandler>();
 var dispatcher = new CommandDispatcher();
 dispatcher.RegisterHandler<NewPostCommand>(commandHandler.HandleAsync);

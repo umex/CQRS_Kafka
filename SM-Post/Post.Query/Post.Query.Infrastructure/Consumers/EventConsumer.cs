@@ -37,6 +37,8 @@ namespace Post.Query.Infrastructure.Consumers
                 if (consumeResult?.Message == null) continue;
 
                 var options = new JsonSerializerOptions { Converters = { new EventJsonConverter() } };
+
+                //we can use the abstract BaseResult cause we are using JsonSerializerOptions where the polymorphism happens
                 var @event = JsonSerializer.Deserialize<BaseEvent>(consumeResult.Message.Value, options);
                 var handlerMethod = _eventHandler.GetType().GetMethod("On", new Type[] { @event.GetType() });
 
@@ -46,6 +48,8 @@ namespace Post.Query.Infrastructure.Consumers
                 }
 
                 handlerMethod.Invoke(_eventHandler, new object[] { @event });
+                //that will tell kafka that we hace successfully consumed and handled the event and that the
+                //commit method that we invoke will increment the Kafka commit log offset.
                 consumer.Commit(consumeResult);
             }
         }

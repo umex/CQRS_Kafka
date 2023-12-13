@@ -10,6 +10,7 @@ namespace Post.Cmd.Infrastructure.Repositories
     {
         private readonly IMongoCollection<EventModel> _eventStoreCollection;
 
+        // IOptions allows us to inject the config via dependency injection
         public EventStoreRepository(IOptions<MongoDbConfig> config)
         {
             var mongoClient = new MongoClient(config.Value.ConnectionString);

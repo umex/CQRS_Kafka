@@ -9,6 +9,7 @@ namespace CQRS.Core.Events
     */
     public class EventModel
     {
+        // Documents in MongoDB must have an _id (ObjectId) member, which uniquely identifies the document within a collection. 
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }

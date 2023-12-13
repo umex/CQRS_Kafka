@@ -3,7 +3,9 @@ using Post.Common.Events;
 
 namespace Post.Cmd.Domain.Aggregates
 {
-    public class PostAggregate : AggregateRoot
+    //Aggregate is Entity that is always kept in a consistent state and the AggregateRoot is the entity within the
+    //aggregate that is responsible for maintaining that state.
+    public class PostAggregate : AggregateRoot //represents our one social media post
     {
         private bool _active;
         private string _author;
@@ -11,6 +13,7 @@ namespace Post.Cmd.Domain.Aggregates
 
         public bool Active { get => _active; set => _active = value; }
 
+        //aggregate aleays need these two constructors
         public PostAggregate()
         {
         }
@@ -52,6 +55,8 @@ namespace Post.Cmd.Domain.Aggregates
             });
         }
 
+        //we need these Apply methods so that the Aggregate knows which event to apply in the ApplyChange method
+        //these methods are used to alter the state of the aggregate
         public void Apply(MessageUpdatedEvent @event)
         {
             _id = @event.Id;
